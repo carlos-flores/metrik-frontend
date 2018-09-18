@@ -1,0 +1,26 @@
+<br/>
+<h2>Últimas Facturas
+    <i class="fas fa-spinner fa-pulse fa-1x cargando" *ngIf="cargandoUltimasFacturas"></i>
+</h2>
+<table class="table table-over table-striped">
+    <thead class="thead-light">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Cliente</th>
+            <th scope="col">Ciudad</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Monto</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let factura of facturas; let i = index">
+            <td>{{factura.factura_id}}</td>
+            <td>{{factura.cliente}}</td>
+            <td>{{factura.ciudad_cliente}}</td>
+            <td>{{factura.estado_cliente}}</td>
+            <td>{{factura.fecha | date:'dd/MMMM/yyyy'}}</td>
+            <td>{{factura.monto | currency:'MXN':'symbol-narrow':'.2-2':'es-MX'}}</td>
+        </tr>
+    </tbody>
+</table>

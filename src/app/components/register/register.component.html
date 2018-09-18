@@ -1,0 +1,43 @@
+<div class="col-md-12">
+    <h1>Registrarme</h1>
+    <hr/>
+    <div class="alert alert-success" *ngIf="status == cadOk">
+        Se ha registrado correctamente. <a [routerLink]="['/login']">Ir al login</a>
+    </div>
+    <div class="alert alert-danger" *ngIf="status == cadError">
+        Se ha presentado un error al registrar
+    </div>
+    <form #registerForm="ngForm" (ngSubmit)='onSubmit(registerForm);'>
+        <div class="form-group">
+            <label>Nombre(s)</label>
+            <input class="form-control" type="text" [(ngModel)]="user.name" name='name' #name="ngModel" required/>
+            <div class="alert alert-danger" *ngIf="!name.valid && name.touched">
+                El nombre es obligatorio
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Apellido(s)</label>
+            <input class="form-control" type="text" [(ngModel)]="user.surname" name='surname' #surname="ngModel" required />
+            <div class="alert alert-danger" *ngIf="!surname.valid && surname.touched">
+                El apellido es obligatorio
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input class="form-control" type="email" [(ngModel)]="user.email" name='email' #email="ngModel" required/>
+            <div class="alert alert-danger" *ngIf="!email.valid && email.touched">
+                El email es obligatorio
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input class="form-control" type="password" [(ngModel)]="user.password" name='password' #password="ngModel" required />
+            <div class="alert alert-danger" *ngIf="!password.valid && password.touched">
+                El password es obligatorio
+            </div>
+        </div>
+        <div class="form-group">
+            <input class="btn btn-success" type="submit" value="registrarme" />
+        </div>
+    </form>
+</div>

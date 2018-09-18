@@ -1,0 +1,164 @@
+<br>
+<form #formulario="ngForm" (ngSubmit)="buscarClientes(formulario)" novalidate="novalidate">
+    <div class="card">
+        <div class="card-header">
+            <div class="form-row">
+                <div class="col-md-10">
+                    <h3 *ngIf="lstPuntos.length>0">Filtros de Clientes({{lstPuntos.length}})</h3>
+                    <h3 *ngIf="lstPuntos.length==0">Filtros de Clientes</h3>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary btn-block" [disabled]="fechaIniControl.invalid || fechaFinControl.invalid || (montoIniControl.enabled && ( montoIniControl.value == null || montoIniControl.value<0)) || (montoFinControl.enabled && ( montoFinControl.value == null || montoFinControl.value < 0 || montoFinControl.value <= montoIniControl.value )) || !fechasValidas(fechaIniControl.value,fechaFinControl.value) || cargandoClientes || cargandoPuntos">Buscar</button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label>Fecha inicio búsqueda</label>
+                    <input type="date" min="2018-01-01" class="form-control" [ngModel]="datosBase.fechaIni" name="fechaIni" #fechaIniControl="ngModel" (change)="change(formulario)" required>
+                    <div *ngIf="fechaIniControl.invalid" class="alert alert-dark" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i> Fecha inválida
+                    </div>
+                    <div *ngIf="fechaIniControl.valid && !fechasValidas(fechaIniControl.value,fechaFinControl.value)" class="alert alert-dark" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i> Fecha no puede ser mayor que fecha final o superior a 31 días
+                    </div>
+
+                </div>
+                <div class="form-group col-md-6">
+                    <label>Fecha fin búsqueda</label>
+                    <input type="date" min="2018-01-01" class="form-control" [ngModel]="datosBase.fechaFin" name="fechaFin" #fechaFinControl="ngModel" (change)="change(formulario)" required>
+                    <div *ngIf="fechaFinControl.invalid " class="alert alert-dark" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i> Fecha inválida
+                    </div>
+                    <div *ngIf="fechaFinControl.valid && !fechasValidas(fechaIniControl.value,fechaFinControl.value)" class="alert alert-dark" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i> Fecha no puede ser menor que fecha final o superior a 31 días
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" [ngModel]="datosBase.banderaFactura" name="banderaFactura" #flagFactura="ngModel">
+                        <label class="form-check-label">
+              Monto de factura
+            </label>
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" [ngModel]="datosBase.banderaCliente" name="banderaCliente">
+                        <label class="form-check-label">
+              Cliente
+            </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label>Monto mínimo</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">$</span>
+                        </div>
+                        <input type="number" class="form-control" [ngModel]="datosBase.montoIni" name="montoIni" min="0" #montoIniControl="ngModel" [disabled]="!formulario.value.banderaFactura">
+                        <div class="input-group-append">
+                            <span class="input-group-text">.00</span>
+                        </div>
+                    </div>
+                    <div *ngIf="montoIniControl.enabled && ( montoIniControl.value == null || montoIniControl.value<0)" class="alert alert-dark" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i> Debe ser mayor o igual a 0
+                    </div>
+                </div>
+                <div class="form-group col-md-3">
+                    <label>Monto máximo</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">$</span>
+                        </div>
+                        <input type="number" class="form-control" [ngModel]="datosBase.montoFin" name="montoFin" min="0" #montoFinControl="ngModel" [disabled]="!formulario.value.banderaFactura">
+                        <div class="input-group-append">
+                            <span class="input-group-text">.00</span>
+                        </div>
+                    </div>
+                    <div *ngIf="montoFinControl.enabled && ( montoFinControl.value == null || montoFinControl.value < 0 || montoFinControl.value <= montoIniControl.value )" class="alert alert-dark" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i> Debe ser mayor que mínimo
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="inputCliente">Cliente
+                        <i class="fas fa-spinner fa-pulse fa-1x cargando" *ngIf="cargandoClientes"></i>
+                    </label>
+                    <select2 [data]="clientesData" width="100%" [options]="optionsClientes" [value]="clientesValue" (valueChanged)="clientesSeleccionados($event)" [disabled]="!formulario.value.banderaCliente"></select2>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" [ngModel]="datosBase.banderaProducto" name="banderaProducto">
+                        <label class="form-check-label">
+                            Producto <i class="fas fa-spinner fa-pulse fa-1x cargando" *ngIf="cargandoProductos"></i>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group col-md-6 text-right" *ngIf="lstPuntos.length>0">
+
+                </div>
+
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <select2 [data]="productosData" width="100%" [options]="optionsProductos" [value]="productosValue" (valueChanged)="productosSeleccionados($event)" [disabled]="!formulario.value.banderaProducto"></select2>
+                </div>
+            </div>
+
+
+            <div *ngIf="!cargandoPuntos">
+                <agm-map [latitude]="lat" [longitude]="lng" [zoom]="zoom" [zoomControl]='true' (mapClick)="mapaPresionado($event)">
+                    <agm-marker *ngFor="let marcador of lstPuntos; let i = index" (markerClick)="marcadorPresionado(marcador,i)" [latitude]="marcador.latitud" [longitude]="marcador.longitud" [markerDraggable]="marcador.arrastrable" (dragEnd)='marcadorArrastrado(marcador, $event)'>
+                        <agm-snazzy-info-window [latitude]="lat" [longitude]="lng" [isOpen]="false" [maxWidth]="700" [closeWhenOthersOpen]="true" (close)="cerrarWindow()">
+                            <ng-template>
+                                <div class="card" style="width: 600px;">
+                                    <div class="card-body">
+                                        <h5 class="card-title">[{{marcador.id}}] {{marcador.nombre}}</h5>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <label>Ciudad:</label>
+                                            </div>
+                                            <div class="col-md-9">
+                                                <label>{{marcador.ciudad}}, {{marcador.estado}}</label>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <label>Dirección:</label>
+                                            </div>
+                                            <div class="col-md-9">
+                                                <label>{{marcador.calle}}. {{marcador.codigo_postal}}</label>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <label>Facturas:</label>
+                                            </div>
+                                            <div class="col-md-9">
+                                                <label>{{marcador.totalFacturas}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </agm-snazzy-info-window>
+                    </agm-marker>
+                </agm-map>
+            </div>
+            <div class="text-center cajaLoading" *ngIf="cargandoPuntos">
+                <i class="fas fa-spinner fa-pulse fa-10x cargando"></i>
+            </div>
+
+
+        </div>
+    </div>
+</form>
+
+<br>
