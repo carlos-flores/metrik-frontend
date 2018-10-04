@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { map, catchError } from "rxjs/operators";
-import { GLOBAL } from "./global";
+//import { GLOBAL } from "./global";
 import swal from "sweetalert";
 import { UserService } from './user.services';
 import { Router } from "@angular/router";
 import { throwError } from "rxjs/internal/observable/throwError";
+import { environment } from '../../environments/environment';
 
 
 @Injectable({
@@ -14,7 +15,8 @@ import { throwError } from "rxjs/internal/observable/throwError";
 export class MapaService {
   public urlMapas: String;
   constructor(public http: HttpClient, public usuarioService: UserService, public router: Router) {
-    this.urlMapas = GLOBAL.url;
+    this.urlMapas = environment.url;
+//    this.urlMapas = GLOBAL.url;
   }
 
   obtenerUltimasFacturas() {
@@ -81,13 +83,29 @@ export class MapaService {
     );
   }
 
-  obtenerFacturasPorPeriodo($fechaIni, $fechaFin) {
+  obtenerProductosPorPeriodo($fechaIni, $fechaFin,$clientes,$productos,$estados,$montoIni,$montoFin) {
+    console.log("Se obtienen los productos");
+    const headers = new HttpHeaders({
+      Authorization: this.usuarioService.getToken()
+    });
+    const URL = this.urlMapas + "productos/periodo/" + $fechaIni + "/" + $fechaFin +"/clientes/"+$clientes+"/productos/"+$productos+"/estados/"+$estados+"/"+$montoIni+"/"+$montoFin;
+    return this.http.get(URL, { headers }).pipe(map((resp: any) => {
+      return resp;
+    }), catchError(error => {
+      this.router.navigate(['/login']);
+      swal('Error', 'Detalle: ' + error.error.text, 'error');
+      return throwError(error);
+    })
+    );
+  }
+
+  obtenerFacturasPorPeriodo($fechaIni, $fechaFin, $estados) {
     console.log("Se obtienen las facturas por período");
     const headers = new HttpHeaders({
       Authorization: this.usuarioService.getToken()
     });
     const URL =
-      this.urlMapas + "facturas/porPeriodo/" + $fechaIni + "/" + $fechaFin;
+      this.urlMapas + "facturas/porPeriodo/" + $fechaIni + "/" + $fechaFin+"/estados/"+$estados;
     return this.http.get(URL, { headers }).pipe( map((resp: any) => {
         return resp;
       }), catchError(error => {
@@ -97,13 +115,13 @@ export class MapaService {
       }) );
   }
 
-  obtenerFacturasPorPeriodoCliente($fechaIni, $fechaFin, $clientes) {
+  obtenerFacturasPorPeriodoCliente($fechaIni, $fechaFin, $clientes, $estados) {
     console.log("Se obtienen las facturas por período-clientes");
     const headers = new HttpHeaders({
       Authorization: this.usuarioService.getToken()
     });
     const URL =
-      this.urlMapas + "facturas/porPeriodo/" + $fechaIni + "/" + $fechaFin+"/clientes/"+$clientes;
+      this.urlMapas + "facturas/porPeriodo/" + $fechaIni + "/" + $fechaFin + "/clientes/" + $clientes + "/estados/" + $estados;
     return this.http.get(URL, { headers }).pipe( map((resp: any) => {
         return resp;
       }), catchError(error => {
@@ -113,13 +131,13 @@ export class MapaService {
       }) );
   }
 
-  obtenerFacturasPorPeriodoMonto($fechaIni, $fechaFin, $montoIni, $montoFin) {
+  obtenerFacturasPorPeriodoMonto($fechaIni, $fechaFin, $montoIni, $montoFin, $estados) {
     console.log("Se obtienen las facturas por período-monto");
     const headers = new HttpHeaders({
       Authorization: this.usuarioService.getToken()
     });
     const URL =
-      this.urlMapas + "facturas/porPeriodo/" + $fechaIni + "/" + $fechaFin + "/monto/" + $montoIni + "/" + $montoFin;
+      this.urlMapas + "facturas/porPeriodo/" + $fechaIni + "/" + $fechaFin + "/monto/" + $montoIni + "/" + $montoFin + "/estados/" + $estados;
     return this.http.get(URL, { headers }).pipe(map((resp: any) => {
       return resp;
     }), catchError(error => {
@@ -129,13 +147,13 @@ export class MapaService {
     }));
   }
 
-  obtenerFacturasPorPeriodoProductos($fechaIni, $fechaFin, $productos) {
+  obtenerFacturasPorPeriodoProductos($fechaIni, $fechaFin, $productos, $estados) {
     console.log("Se obtienen las facturas por período-productos");
     const headers = new HttpHeaders({
       Authorization: this.usuarioService.getToken()
     });
     const URL =
-      this.urlMapas + "facturas/porPeriodo/" + $fechaIni + "/" + $fechaFin + "/productos/" + $productos;
+      this.urlMapas + "facturas/porPeriodo/" + $fechaIni + "/" + $fechaFin + "/productos/" + $productos + "/estados/" + $estados;
     return this.http.get(URL, { headers }).pipe(map((resp: any) => {
       return resp;
     }), catchError(error => {
@@ -145,13 +163,13 @@ export class MapaService {
     }));
   }
 
-  obtenerFacturasPorPeriodoClienteMonto($fechaIni, $fechaFin, $clientes, $montoIni, $montoFin) {
+  obtenerFacturasPorPeriodoClienteMonto($fechaIni, $fechaFin, $clientes, $montoIni, $montoFin, $estados) {
     console.log("Se obtienen las facturas por período-clientes-monto");
     const headers = new HttpHeaders({
       Authorization: this.usuarioService.getToken()
     });
     const URL =
-      this.urlMapas + "facturas/porPeriodo/" + $fechaIni + "/" + $fechaFin + "/clientes/" + $clientes + "/monto/" + $montoIni + "/" + $montoFin;
+      this.urlMapas + "facturas/porPeriodo/" + $fechaIni + "/" + $fechaFin + "/clientes/" + $clientes + "/monto/" + $montoIni + "/" + $montoFin + "/estados/" + $estados;
     return this.http.get(URL, { headers }).pipe( map((resp: any) => {
         return resp;
       }), catchError(error => {
@@ -161,13 +179,13 @@ export class MapaService {
       }) );
   }
 
-  obtenerFacturasPorPeriodoClienteProductos($fechaIni, $fechaFin, $clientes, $productos) {
+  obtenerFacturasPorPeriodoClienteProductos($fechaIni, $fechaFin, $clientes, $productos, $estados) {
     console.log("Se obtienen las facturas por período-clientes-productos");
     const headers = new HttpHeaders({
       Authorization: this.usuarioService.getToken()
     });
     const URL =
-      this.urlMapas + "facturas/porPeriodo/" + $fechaIni + "/" + $fechaFin + "/clientes/" + $clientes + "/productos/" + $productos;
+      this.urlMapas + "facturas/porPeriodo/" + $fechaIni + "/" + $fechaFin + "/clientes/" + $clientes + "/productos/" + $productos + "/estados/" + $estados;
     return this.http.get(URL, { headers }).pipe(map((resp: any) => {
       return resp;
     }), catchError(error => {
@@ -177,13 +195,13 @@ export class MapaService {
     }));
   }
 
-  obtenerFacturasPorPeriodoProductosMonto($fechaIni, $fechaFin, $productos, $montoIni, $montoFin) {
+  obtenerFacturasPorPeriodoProductosMonto($fechaIni, $fechaFin, $productos, $montoIni, $montoFin, $estados) {
     console.log("Se obtienen las facturas por período-clientes-monto");
     const headers = new HttpHeaders({
       Authorization: this.usuarioService.getToken()
     });
     const URL =
-      this.urlMapas + "facturas/porPeriodo/" + $fechaIni + "/" + $fechaFin + "/productos/" + $productos + "/monto/" + $montoIni + "/" + $montoFin;
+      this.urlMapas + "facturas/porPeriodo/" + $fechaIni + "/" + $fechaFin + "/productos/" + $productos + "/monto/" + $montoIni + "/" + $montoFin + "/estados/" + $estados;
     return this.http.get(URL, { headers }).pipe(map((resp: any) => {
       return resp;
     }), catchError(error => {
@@ -193,13 +211,13 @@ export class MapaService {
     }));
   }
 
-  obtenerFacturasPorPeriodoClientesProductosMonto($fechaIni, $fechaFin, $clientes, $productos, $montoIni, $montoFin) {
+  obtenerFacturasPorPeriodoClientesProductosMonto($fechaIni, $fechaFin, $clientes, $productos, $montoIni, $montoFin, $estados) {
     console.log("Se obtienen las facturas por período-clientes-productos-monto");
     const headers = new HttpHeaders({
       Authorization: this.usuarioService.getToken()
     });
     const URL =
-      this.urlMapas + "facturas/porPeriodo/" + $fechaIni + "/" + $fechaFin + "/clientes/"+$clientes+"/productos/" + $productos + "/monto/" + $montoIni + "/" + $montoFin;
+      this.urlMapas + "facturas/porPeriodo/" + $fechaIni + "/" + $fechaFin + "/clientes/" + $clientes + "/productos/" + $productos + "/monto/" + $montoIni + "/" + $montoFin + "/estados/" + $estados;
     return this.http.get(URL, { headers }).pipe(map((resp: any) => {
       return resp;
     }), catchError(error => {
@@ -210,12 +228,12 @@ export class MapaService {
   }
 
 
-  obtenerFacturasPorClientePeriodo($cliente, $fechaIni, $fechaFin) {
+  obtenerFacturasPorClientePeriodo($cliente, $fechaIni, $fechaFin, $estados) {
     console.log("Se obtienen las facturas por clientes-periodo");
     const headers = new HttpHeaders({
       Authorization: this.usuarioService.getToken()
     });
-    const URL = this.urlMapas + "facturas/porCliente/" + $cliente + "/periodo/" + $fechaIni + "/" + $fechaFin;
+    const URL = this.urlMapas + "facturas/porCliente/" + $cliente + "/periodo/" + $fechaIni + "/" + $fechaFin + "/estados/" + $estados;
     return this.http.get(URL, { headers }).pipe( map((resp: any) => {
         return resp;
       }), catchError(error => {
@@ -225,12 +243,12 @@ export class MapaService {
       }) );
   }
 
-  obtenerFacturasPorClientePeriodoMonto($cliente, $fechaIni, $fechaFin, $montoIni, $montoFin) {
+  obtenerFacturasPorClientePeriodoMonto($cliente, $fechaIni, $fechaFin, $montoIni, $montoFin, $estados) {
     console.log("Se obtienen las facturas por cliente-período-monto");
     const headers = new HttpHeaders({
       Authorization: this.usuarioService.getToken()
     });
-    const URL = this.urlMapas + "facturas/porCliente/" + $cliente + "/periodo/" + $fechaIni + "/" + $fechaFin + "/monto/" + $montoIni + "/" + $montoFin;
+    const URL = this.urlMapas + "facturas/porCliente/" + $cliente + "/periodo/" + $fechaIni + "/" + $fechaFin + "/monto/" + $montoIni + "/" + $montoFin + "/estados/" + $estados;
     return this.http.get(URL, { headers }).pipe( map((resp: any) => {
         return resp;
       }), catchError(error => {
@@ -240,12 +258,12 @@ export class MapaService {
       }) );
   }
 
-  obtenerFacturasPorClientePeriodoProductos($cliente, $fechaIni, $fechaFin, $productos) {
+  obtenerFacturasPorClientePeriodoProductos($cliente, $fechaIni, $fechaFin, $productos, $estados) {
     console.log("Se obtienen las facturas por cliente-período-productos");
     const headers = new HttpHeaders({
       Authorization: this.usuarioService.getToken()
     });
-    const URL = this.urlMapas + "facturas/porCliente/" + $cliente + "/periodo/" + $fechaIni + "/" + $fechaFin + "/productos/" + $productos;
+    const URL = this.urlMapas + "facturas/porCliente/" + $cliente + "/periodo/" + $fechaIni + "/" + $fechaFin + "/productos/" + $productos + "/estados/" + $estados;
     return this.http.get(URL, { headers }).pipe(map((resp: any) => {
       return resp;
     }), catchError(error => {
@@ -255,12 +273,12 @@ export class MapaService {
     }));
   }
 
-  obtenerFacturasPorClientePeriodoMontoProductos($cliente, $fechaIni, $fechaFin, $montoIni, $montoFin, $productos) {
+  obtenerFacturasPorClientePeriodoMontoProductos($cliente, $fechaIni, $fechaFin, $montoIni, $montoFin, $productos, $estados) {
     console.log("Se obtienen las facturas por cliente-período-monto");
     const headers = new HttpHeaders({
       Authorization: this.usuarioService.getToken()
     });
-    const URL = this.urlMapas + "facturas/porCliente/" + $cliente + "/periodo/" + $fechaIni + "/" + $fechaFin + "/monto/" + $montoIni + "/" + $montoFin + "/productos/" + $productos;
+    const URL = this.urlMapas + "facturas/porCliente/" + $cliente + "/periodo/" + $fechaIni + "/" + $fechaFin + "/monto/" + $montoIni + "/" + $montoFin + "/productos/" + $productos + "/estados/" + $estados;
     return this.http.get(URL, { headers }).pipe(map((resp: any) => {
       return resp;
     }), catchError(error => {

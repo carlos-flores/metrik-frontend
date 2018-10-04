@@ -87,8 +87,8 @@
                 </div>
                 <div class="form-group col-md-6">
                     <label for="inputCliente">Cliente
-                        <i class="fas fa-spinner fa-pulse fa-1x cargando" *ngIf="cargandoClientes"></i>
-                    </label>
+            <i class="fas fa-spinner fa-pulse fa-1x cargando" *ngIf="cargandoClientes"></i>
+          </label>
                     <select2 [data]="clientesData" width="100%" [options]="optionsClientes" [value]="clientesValue" (valueChanged)="clientesSeleccionados($event)" [disabled]="!formulario.value.banderaCliente"></select2>
                 </div>
             </div>
@@ -97,18 +97,26 @@
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" [ngModel]="datosBase.banderaProducto" name="banderaProducto">
                         <label class="form-check-label">
-                            Producto <i class="fas fa-spinner fa-pulse fa-1x cargando" *ngIf="cargandoProductos"></i>
-                        </label>
+              Producto <i class="fas fa-spinner fa-pulse fa-1x cargando" *ngIf="cargandoProductos"></i>
+            </label>
                     </div>
                 </div>
-                <div class="form-group col-md-6 text-right" *ngIf="lstPuntos.length>0">
-
+                <div class="form-group col-md-6">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" [ngModel]="datosBase.banderaEstado" name="banderaEstado">
+                        <label class="form-check-label">
+              Estado
+            </label>
+                    </div>
                 </div>
 
             </div>
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <select2 [data]="productosData" width="100%" [options]="optionsProductos" [value]="productosValue" (valueChanged)="productosSeleccionados($event)" [disabled]="!formulario.value.banderaProducto"></select2>
+                </div>
+                <div class="form-group col-md-6">
+                    <select2 [data]="estadosData" width="100%" [options]="optionsEstados" [value]="estadosValue" (valueChanged)="estadosSeleccionados($event)" [disabled]="!formulario.value.banderaEstado"></select2>
                 </div>
             </div>
 
@@ -152,9 +160,58 @@
                     </agm-marker>
                 </agm-map>
             </div>
+            <br />
             <div class="text-center cajaLoading" *ngIf="cargandoPuntos">
                 <i class="fas fa-spinner fa-pulse fa-10x cargando"></i>
             </div>
+            <div *ngIf="lstProductos.length>0 && !cargandoPuntos">
+                <h2>Productos ({{lstProductos.length}}) <i class="far fa-file-pdf" (click)="productosPDF()"></i></h2>
+                <table class="table table-over table-striped" id="tablaProductos">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Código</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Total Facturas</th>
+                            <th scope="col">Total Unidades</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let product of lstProductos; let i = index">
+                            <td>{{product.id}}</td>
+                            <td>{{product.code}}</td>
+                            <td>{{product.name}}</td>
+                            <td>{{product.total1}}</td>
+                            <td>{{product.total2}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div *ngIf="lstClientes.length>0 && !cargandoPuntos">
+                <h2>Clientes ({{lstClientes.length}}) <i class="far fa-file-pdf" (click)="clientesPDF()"></i></h2>
+                <table class="table table-over table-striped" id="tablaClientes">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Ciudad</th>
+                            <th scope="col">Dirección</th>
+                            <th scope="col">Facturas</th>
+                            <th scope="col">Pos.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let cliente of lstClientes; let i = index">
+                            <td>{{cliente.nombre}}</td>
+                            <td>{{cliente.ciudad}}, {{cliente.estado}}</td>
+                            <td>{{cliente.calle}}, {{cliente.codigo_postal}}</td>
+                            <td>{{cliente.totalFacturas}}</td>
+                            <td><i class="fas fa-map-marker-alt" *ngIf="cliente.localizado"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
 
 
         </div>

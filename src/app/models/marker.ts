@@ -11,7 +11,8 @@ export class Marker {
       public codigo_postal?: string,
       public descripcion?: string,
       public totalFacturas?: number,
-      public arrastrable?: boolean
+      public arrastrable?: boolean,
+      public localizado?: boolean
     ) { }
 
 }

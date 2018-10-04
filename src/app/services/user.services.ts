@@ -5,10 +5,11 @@ import { Observable} from 'rxjs/Observable';
 // import { map, catchError } from 'rxjs/operators';
 
 import 'rxjs/Rx';
-import { GLOBAL } from './global';
+//import { GLOBAL } from './global';
 import { User } from '../models/user';
 import swal from 'sweetalert';
 import { throwError } from 'rxjs/internal/observable/throwError';
+import { environment } from '../../environments/environment';
 
 
 @Injectable()
@@ -16,7 +17,8 @@ export class UserService {
   public url: String;
 
   constructor(public _http: HttpClient) {
-    this.url = GLOBAL.url;
+    this.url = environment.url;
+    //this.url = GLOBAL.url;
   }
 
   prueba() {
