@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
 // import { Http, Headers } from '@angular/http';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { map, catchError } from "rxjs/operators";
+import { Router } from "@angular/router";
 import { Observable} from 'rxjs/Observable';
 // import { map, catchError } from 'rxjs/operators';
 
 import 'rxjs/Rx';
 //import { GLOBAL } from './global';
+
 import { User } from '../models/user';
 import swal from 'sweetalert';
 import { throwError } from 'rxjs/internal/observable/throwError';
@@ -16,14 +19,14 @@ import { environment } from '../../environments/environment';
 export class UserService {
   public url: String;
 
-  constructor(public _http: HttpClient) {
+  constructor(public _http: HttpClient, public router: Router) {
     this.url = environment.url;
     //this.url = GLOBAL.url;
   }
 
   prueba() {
-    console.log('se ha presionado el botón de registro');
-    return 'Hola mundo';
+    console.log("se ha presionado el botón de registro");
+    return "Hola mundo";
   }
 
   /**
@@ -33,18 +36,102 @@ export class UserService {
    * @return          Status de la petición
    */
   register(user: User) {
-    console.log('Se registra usuario.');
+    console.log("Se registra usuario.");
     const body = JSON.stringify(user);
-    const params = 'json=' + body;
+    const params = "json=" + body;
     const headers = new HttpHeaders({
-      'Content-Type': 'application/x-www-form-urlencoded'
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: this.getToken()
     });
-    return this._http.post(this.url + 'register', params, { headers })
-      .map((res: any) => {
-        console.log('Registro usuario: OK');
-        console.log(res);
+    return this._http.post(this.url + "register", params, { headers }).pipe(
+      map((res: any) => {
         return res;
-      });
+      }),
+      catchError(error => {
+        this.router.navigate(["/login"]);
+        swal("Error", "Detalle: " + error.error.text, "error");
+        return throwError(error);
+      })
+    );
+  }
+
+  update(user: User) {
+    console.log("Se registra usuario.");
+    const body = JSON.stringify(user);
+    const params = "json=" + body;
+    const headers = new HttpHeaders({
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: this.getToken()
+    });
+    return this._http
+      .put(this.url + "usuarios/update/" + user.id, params, { headers })
+      .pipe(
+        map((res: any) => {
+          return res;
+        }),
+        catchError(error => {
+          this.router.navigate(["/login"]);
+          swal("Error", "Detalle: " + error.error.text, "error");
+          return throwError(error);
+        })
+      );
+  }
+
+  updatePassword(user: User) {
+    console.log("Se actualiza password de usuario.");
+    const body = JSON.stringify(user);
+    const params = "json=" + body;
+    const headers = new HttpHeaders({
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: this.getToken()
+    });
+    return this._http
+      .put(this.url + "usuarios/updatePassword/" + user.id, params, { headers })
+      .pipe(
+        map((res: any) => {
+          return res;
+        }),
+        catchError(error => {
+          this.router.navigate(["/login"]);
+          swal("Error", "Detalle: " + error.error.text, "error");
+          return throwError(error);
+        })
+      );
+  }
+
+  delete(userId) {
+    console.log("Se elimina usuario.");
+    const headers = new HttpHeaders({
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: this.getToken()
+    });
+    return this._http.delete(this.url + "usuarios/delete/" + userId, { headers })
+      .pipe(
+        map((res: any) => {
+          return res;
+        }),
+        catchError(error => {
+          this.router.navigate(["/login"]);
+          swal("Error", "Detalle: " + error.error.text, "error");
+          return throwError(error);
+        })
+      );
+  }
+
+  obtenerUsuarios() {
+    console.log("Se obtienen los usuarios registrados");
+    const headers = new HttpHeaders({ Authorization: this.getToken() });
+    const URL = this.url + "usuarios/list";
+    return this._http.get(URL, { headers }).pipe(
+      map((resp: any) => {
+        return resp;
+      }),
+      catchError(error => {
+        this.router.navigate(["/login"]);
+        swal("Error", "Detalle: " + error.error.text, "error");
+        return throwError(error);
+      })
+    );
   }
 
   /**
@@ -55,19 +142,20 @@ export class UserService {
    */
   signup(user: User) {
     const body = JSON.stringify(user);
-    const params = 'json=' + body;
+    const params = "json=" + body;
     const headers = new HttpHeaders({
-      'Content-Type': 'application/x-www-form-urlencoded'
+      "Content-Type": "application/x-www-form-urlencoded"
     });
-    return this._http.post(this.url + 'login', params, { headers })
-    .map((res: any) => {
-      return res;
-    });
+    return this._http
+      .post(this.url + "login", params, { headers })
+      .map((res: any) => {
+        return res;
+      });
   }
 
   getIDentity() {
-    const identity = JSON.parse(localStorage.getItem('usuarioRegistrado'));
-    if (identity !== 'undefined') {
+    const identity = JSON.parse(localStorage.getItem("usuarioRegistrado"));
+    if (identity !== "undefined") {
       return identity;
     } else {
       return null;
@@ -75,8 +163,8 @@ export class UserService {
   }
 
   getToken() {
-    const token = localStorage.getItem('token');
-    if (token !== 'undefined') {
+    const token = localStorage.getItem("token");
+    if (token !== "undefined") {
       return token;
     } else {
       return null;

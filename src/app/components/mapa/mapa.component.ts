@@ -648,8 +648,8 @@ export class MapaComponent implements OnInit {
 
   fechasValidas(fechaIniControl, fechaFinControl) {
     if (
-      Date.parse(fechaIniControl) < Date.parse(fechaFinControl) &&
-      Date.parse(fechaFinControl) - Date.parse(fechaIniControl) < 2678400000
+      Date.parse(fechaIniControl) < Date.parse(fechaFinControl) 
+      //&& Date.parse(fechaFinControl) - Date.parse(fechaIniControl) < 2678400000
     ) {
       return true;
     }

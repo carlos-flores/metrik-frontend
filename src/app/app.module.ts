@@ -11,15 +11,14 @@ import { APP_ROUTES } from './app.routes';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
-
+import { MapaComponent } from "./components/mapa/mapa.component";
+import { UsuariosComponent } from "./components/usuarios/usuarios.component";
 import { DefaultComponent } from './components/default/default.component';
+
 import { UserService } from './services/user.services';
 
 import { AgmCoreModule } from '@agm/core';
 import { AgmSnazzyInfoWindowModule } from "@agm/snazzy-info-window";
-
-import { MapaComponent } from './components/mapa/mapa.component';
-
 
 
 import localeEs from "@angular/common/locales/es-MX";
@@ -29,13 +28,15 @@ registerLocaleData(localeEs,'es-MX');
 //import * as $ from "jquery";
 import { Select2Module } from "ng2-select2";
 
+
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     RegisterComponent,
     DefaultComponent,
-    MapaComponent
+    MapaComponent,
+    UsuariosComponent
   ],
   imports: [
     BrowserModule,

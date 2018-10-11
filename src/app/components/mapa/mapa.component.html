@@ -16,7 +16,7 @@
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label>Fecha inicio búsqueda</label>
-                    <input type="date" min="2018-01-01" class="form-control" [ngModel]="datosBase.fechaIni" name="fechaIni" #fechaIniControl="ngModel" (change)="change(formulario)" required>
+                    <input type="date" class="form-control" [ngModel]="datosBase.fechaIni" name="fechaIni" #fechaIniControl="ngModel" (change)="change(formulario)" required>
                     <div *ngIf="fechaIniControl.invalid" class="alert alert-dark" role="alert">
                         <i class="fas fa-exclamation-triangle"></i> Fecha inválida
                     </div>

@@ -3,6 +3,7 @@ import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { DefaultComponent } from './components/default/default.component';
 import { MapaComponent } from './components/mapa/mapa.component';
+import { UsuariosComponent } from './components/usuarios/usuarios.component';
 
 
 const app_routes: Routes = [
@@ -12,6 +13,7 @@ const app_routes: Routes = [
   { path: "logout/:sure", component: LoginComponent },
   { path: "register", component: RegisterComponent },
   { path: "facturas", component: MapaComponent },
+  { path: "usuarios", component: UsuariosComponent },
   { path: "**", pathMatch: "full", redirectTo: "home" }
 ];
 

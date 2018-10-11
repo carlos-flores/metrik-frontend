@@ -55,7 +55,7 @@ export class LoginComponent implements OnInit {
               this.status = this.cadError;
             }
           );
-        }else{
+        } else {
           form.reset();
           this.status = this.cadError;
         }

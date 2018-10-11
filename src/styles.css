@@ -10,3 +10,11 @@
     justify-content: center;
     align-items: center;
 }
+
+.pointer {
+    cursor: pointer;
+}
+
+.no-pointer {
+    cursor: default;
+}

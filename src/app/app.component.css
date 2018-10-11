@@ -1,0 +1,8 @@
+.navbar-nav .active {
+    border-bottom: 3px solid white;
+}
+
+.navbar .navbar-collapse .navbar-nav .nav-item:hover {
+    border-bottom: 3px solid #999;
+    transition: all 0.5s;
+}

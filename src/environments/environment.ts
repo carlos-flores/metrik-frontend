@@ -2,7 +2,7 @@
 // `ng build ---prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
-export const environment = { production: false, url: "http://metrik-backend.io/api/" };
+export const environment = { production: true, url: "http://metrik-backend.io/api/" };
 
 /*
  * In development mode, to ignore zone related error stack frames such as

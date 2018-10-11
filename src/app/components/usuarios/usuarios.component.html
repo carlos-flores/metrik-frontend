@@ -1,0 +1,247 @@
+<br />
+<div class="card">
+    <div class="card-header">
+        <div class="form-row">
+            <div class="col-md-11">
+                <h2>Usuarios <i class="fas fa-spinner fa-pulse fa-1x cargando" *ngIf="cargandoUsuarios"></i></h2>
+            </div>
+            <div class="col-md-1 text-right">
+                <!-- <button type="button" class="btn btn-primary btn-block" (click)="editarUsuario()"><i class="fas fa-user-plus"></i>Agregar</button> -->
+                <i class="fas fa-user-plus fa-2x pointer" title="Agregar usuario" (click)="prepararUsuarioNuevo()" data-toggle="modal" data-target="#exampleModal"></i>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-over table-striped">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nombre(s)</th>
+                    <th scope="col">Apellido(s)</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Role</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let usuario of usuariosTabla; let i = index">
+                    <td>{{(paginacionActual-1)*10 + i + 1}}</td>
+                    <td>{{usuario.name}}</td>
+                    <td>{{usuario.surname}}</td>
+                    <td>{{usuario.email}}</td>
+                    <td>
+                        <div *ngIf="usuario.role === 'admin'">
+                            <i class="fas fa-user-tie"> </i> Administrador
+                        </div>
+                        <div *ngIf="usuario.role === 'user'">
+                            Usuario
+                        </div>
+                    </td>
+                    <td><i class="fas fa-user-edit fa-lg pointer" title="Editar usuario" (click)="editarUsuario(usuario)" data-toggle="modal" data-target="#updateModal"></i>&nbsp;&nbsp;
+                        <i class="fas fa-user-times fa-lg pointer" title="Eliminar usuario" (click)="eliminarUsuario(usuario)" data-toggle="modal" data-target="#deleteModal"></i>&nbsp;&nbsp;
+                        <i class="fas fa-key fa-lg pointer" title="Cambiar contraseña" (click)="cambiarPassword(usuario)" data-toggle="modal" data-target="#updatePasswordModal"></i>
+                </tr>
+            </tbody>
+        </table>
+        <nav aria-label="Page navigation example" *ngIf="usuarios.length>10">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" [ngClass]="{'disabled': paginacionActual-1==0}"><button class="page-link" (click)="paginaInicial()" [disabled]="paginacionActual-1==0"><i class="fas fa-step-backward"></i></button></li>
+                <li class="page-item" [ngClass]="{'disabled': paginacionActual-1==0}"><button class="page-link" (click)="paginaAnterior()"><i
+          class="fas fa-backward"></i></button></li>
+                <li class="page-item active"><button class="page-link">{{paginacionActual}}</button></li>
+                <li class="page-item" [ngClass]="{'disabled': paginacionActual==paginacionMaxima}"><button class="page-link" (click)="paginaSiguiente()"><i class="fas fa-forward"></i></button></li>
+                <li class="page-item" [ngClass]="{'disabled': paginacionActual==paginacionMaxima}"><button class="page-link" (click)="paginaFinal()"><i class="fas fa-step-forward"></i></button></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<div class="modal fade" #exampleModal id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form #formulario="ngForm" (ngSubmit)="registrarUsuario(formulario)" novalidate="novalidate">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-user-plus"></i> Nuevo Usuario <i class="fas fa-spinner fa-pulse fa-1x cargando" *ngIf="registrandoUsuario"></i></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+                </div>
+                <div class="modal-body">
+
+
+                    <div class="form-group row">
+                        <label for="inName" class="col-sm-4 col-form-label">Nombre(s)</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="inName" [(ngModel)]="usuarioNuevo.name" name="name" #nameControl="ngModel" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inSurname" class="col-sm-4 col-form-label">Apellido(s)</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="inSurname" [(ngModel)]="usuarioNuevo.surname" name="surname" #surnameControl="ngModel" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inEmail" class="col-sm-4 col-form-label">Email</label>
+                        <div class="col-sm-8">
+                            <input type="email" class="form-control" id="inEmail" [(ngModel)]="usuarioNuevo.email" name="email" #emailControl="ngModel" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$">
+                            <div class="alert alert-danger" role="alert" *ngIf="emailControl.invalid && emailControl.touched">
+                                Se debe de agregar un email valido
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inRole" class="col-sm-4 col-form-label">Role</label>
+                        <!--                       <div class="col-sm-8">
+                                <input type="text" class="form-control" id="inRole" [(ngModel)]="usuarioNuevo.role" name="role" #roleControl="ngModel" required>
+                            </div> -->
+                        <div class="col-md-8">
+                            <!-- <select2 [data]="rolesDATA" class="form-control" width="100%" [options]="optionsROLES" [value]="roleSeleccionado" (valueChanged)="roleSeleccionadoEvent($event)" required></select2> -->
+                            <select class="form-control custom-select custom-select" [(ngModel)]="usuarioNuevo.role" name="role" #roleControl="ngModel" required>
+                <option value="admin">Administrador</option>
+                <option value="user">Usuario</option>
+              </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inPassword" class="col-sm-4 col-form-label">Password</label>
+                        <div class="col-sm-8">
+                            <input type="password" class="form-control" id="inPassword" [(ngModel)]="usuarioNuevo.password" name="password" #passwordControl="ngModel" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inPassword2" class="col-sm-4 col-form-label">Confirmación</label>
+                        <div class="col-sm-8">
+                            <input type="password" class="form-control" id="inPassword2" [(ngModel)]="usuarioNuevo.password2" name="password2" required #password2Control="ngModel">
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times-circle"></i>
+            Cerrar</button>
+                    <button type="submit" class="btn btn-primary" [disabled]="!formulario.valid && !registrandoUsuario"><i class="fas fa-save"></i>
+            Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!------------------------------------ 
+  MODAL UPDATE 
+-------------------------------------->
+<div class="modal fade" #updateModal id="updateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form #formularioUpdate="ngForm" (ngSubmit)="actualizarUsuario(formularioUpdate)" novalidate="novalidate">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-user-edit"></i> Actualizar Usuario <i class="fas fa-spinner fa-pulse fa-1x cargando" *ngIf="registrandoUsuario"></i></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+                </div>
+                <div class="modal-body">
+
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Nombre(s)</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" [ngModel]="usuarioSeleccionado.name" name="name" #nameUpdateControl="ngModel" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="updateSurname" class="col-sm-4 col-form-label">Apellido(s)</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="updateSurname" [ngModel]="usuarioSeleccionado.surname" name="surname" #surnameUpdateControl="ngModel" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="updateEmail" class="col-sm-4 col-form-label">Email</label>
+                        <div class="col-sm-8">
+                            <input type="email" class="form-control" id="updateEmail" [ngModel]="usuarioSeleccionado.email" name="email" #emailUpdateControl="ngModel" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$">
+                            <div class="alert alert-danger" role="alert" *ngIf="emailUpdateControl.invalid && emailUpdateControl.touched">
+                                Se debe de agregar un email valido
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="updateRole" class="col-sm-4 col-form-label">Role</label>
+                        <div class="col-md-8">
+                            <select class="form-control custom-select custom-select" [ngModel]="usuarioSeleccionado.role" name="role" #roleUpdateControl="ngModel" required>
+                              <option value="admin">Administrador</option>
+                              <option value="user">Usuario</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times-circle"></i> Cerrar</button>
+                    <button type="submit" class="btn btn-primary" [disabled]="!formularioUpdate.valid && !registrandoUsuario"><i class="fas fa-save"></i> Actualizar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!------------------------------------ 
+  MODAL UPDATE PASSWORD 
+-------------------------------------->
+<div class="modal fade" #updatePasswordModal id="updatePasswordModal" tabindex="-1" role="dialog" aria-labelledby="updatePasswordLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form #formularioUpdatePassword="ngForm" (ngSubmit)="actualizarPasswordUsuario(formularioUpdatePassword)" novalidate="novalidate">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updatePasswordLabel"><i class="fas fa-key"></i> Actualizar Password Usuario <i class="fas fa-spinner fa-pulse fa-1x cargando" *ngIf="registrandoUsuario"></i></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Password</label>
+                        <div class="col-sm-8">
+                            <input type="password" class="form-control" [ngModel]="usuarioSeleccionado.password" name="password" #passwordUpdateControl="ngModel" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Confirmación</label>
+                        <div class="col-sm-8">
+                            <input type="password" class="form-control" [ngModel]="usuarioSeleccionado.password2" name="password2" #password2UpdateControl="ngModel" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times-circle"></i>Cerrar</button>
+                    <button type="submit" class="btn btn-primary" [disabled]="!formularioUpdatePassword.valid && !registrandoUsuario"><i class="fas fa-save"></i> Actualizar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!------------------------------------ 
+  MODAL DELETE USUARIO 
+-------------------------------------->
+<div class="modal fade" #deleteModal id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form #formularioDelete="ngForm" (ngSubmit)="borrarUsuario()" novalidate="novalidate">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteLabel"><i class="fas fa-user-times"></i> Eliminar Usuario
+                        <i class="fas fa-spinner fa-pulse fa-1x cargando" *ngIf="registrandoUsuario"></i></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+                </div>
+                <div class="modal-body">
+                    <label class="col-form-label">¿Desea eliminar al usuario?</label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times-circle"></i> Cerrar</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-trash"></i> Eliminar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
